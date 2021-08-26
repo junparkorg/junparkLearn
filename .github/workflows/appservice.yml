@@ -30,8 +30,9 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: build Bicep file
-        uses: Azure/cli@1.0.4
+        uses: azure/CLI@v1
         with:
+          azcliversion: 2.0.72
           inlineScript: |
             az bicep build --file ${{ env.bicepfilePath }} --outfile ./main.json
 
