@@ -71,6 +71,7 @@
 				"siteConfig": {
 					"linuxFxVersion": "DOTNETCORE|5.0",
 					"alwaysOn": true,
+					"acrUseManagedIdentityCreds": true,
 					"appSettings": [
 						{
 							"name": "WEBSITE_WEBDEPLOY_USE_SCM",
