@@ -20,10 +20,40 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      #build bicep
+      - name: Run Bicep build
+        uses: aliencube/bicep-build-actions@v0.1
+        with:
+          files: Infrastructure/main.bicep
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      #create resource group
+      - name: Create Resource Group
+        run: |
+          az group create -g "githubkorea" -l "Korea Central"
+
+      #Deploy Arm Template 
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: azure/arm-deploy@v1
+        id: deploy
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+          resourceGroupName: githubkorea
+          template: ./Infrastructure/main.json
+          deploymentMode: Incremental
+
+      - name: Build image with ACR
+        run: |
+          az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
+      - name: Deploy the image to App Service
+        run: |
+          az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name ${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }} --docker-registry-server-url https://${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io
+
 
       - name: Azure CLI script
         uses: azure/CLI@v1
