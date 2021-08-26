@@ -29,18 +29,7 @@ jobs:
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: build Bicep file
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.0.72
-          inlineScript: |
-            az bicep build --file ${{ env.bicepfilePath }} --outfile ./main.json
-
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          path: ./main.json 
-
+      
       #create resource group
       - name: Create Resource Group
         run: |
