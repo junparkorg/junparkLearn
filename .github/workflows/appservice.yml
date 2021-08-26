@@ -51,7 +51,7 @@ jobs:
           az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
       - name: Deploy the image to App Service
         run: |
-          az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name aspnet5webapp:${{ env.COMMIT_REF }} --docker-registry-server-url https://${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io #--docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
+          az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name aspnet5webapp:${{ env.COMMIT_REF }} --docker-registry-server-url https://${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
 
 
       - name: Azure CLI script
