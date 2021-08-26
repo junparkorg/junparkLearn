@@ -10,6 +10,10 @@ on:
     branches:
       - main
 
+env:
+  resourceGroupName: githubkorea
+  bicepfilePath: ./Infrastructure/main.bicep
+
 jobs:
   Build:
     runs-on: ubuntu-20.04
@@ -18,23 +22,28 @@ jobs:
       COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
 
     steps:
-      - uses: actions/checkout@v2
-
-      #build bicep
-      - name: Run Bicep build
-        uses: aliencube/bicep-build-actions@v0.3
-        with:
-          files: Infrastructure/main.bicep
+      - uses: actions/checkout@v2      
 
       - name: Login to Azure
         uses: azure/login@v1
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: build Bicep file
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: |
+            az bicep build –file ${{ env.bicepfilePath }} –outfile ./main.json
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          path: ./main.json 
+
       #create resource group
       - name: Create Resource Group
         run: |
-          az group create -g "githubkorea" -l "Korea Central"
+          az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
 
       #Deploy Arm Template 
       - name: Deploy Azure Resource Manager (ARM) Template
@@ -43,7 +52,7 @@ jobs:
         with:
           scope: resourcegroup
           subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-          resourceGroupName: githubkorea
+          resourceGroupName: ${{ env.resourceGroupName }}
           template: ./Infrastructure/main.json
           deploymentMode: Incremental
 
