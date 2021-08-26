@@ -16,7 +16,7 @@
 	"variables": {
 		"appServicePlanName": "[format('appserviceplan-{0}', parameters('webAppName'))]",
 		"identityName": "junparkSPN2",
-		"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '01db9ff5-520e-46b3-9e95-42797cd9c07d')]",
+		"roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '7ef5a60f-0cf6-44b3-a5fe-03f2ce21ed74')]",
 		"roleAssignmentName": "[guid(variables('identityName'), variables('roleDefinitionId'))]"
 	},
 	"resources": [
