@@ -1,0 +1,95 @@
+name: App_service
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  resourceGroupName: githubkorea
+  COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
+
+jobs:
+  Build-Test:
+    runs-on: ubuntu-20.04
+    
+    strategy:
+      matrix:
+        dotnet-version: ['5.0.x' ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: ./WebApp
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./WebApp
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        working-directory: ./WebApp      
+
+  Deploy-Dev:
+    runs-on: 'ubuntu-latest'
+    environment: 'dev'
+    needs: Build-Test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #create resource group
+      - name: Create Resource Group
+        run: |
+          az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+
+      #Deploy Arm Template 
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: azure/arm-deploy@v1
+        id: deploy
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ env.resourceGroupName }}
+          template: ./Infrastructure/main.json
+          deploymentMode: Incremental
+
+      - name: Build image with ACR
+        run: |
+          az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
+           
+
+      - name: Deploy the image to App Service
+        run: |
+          az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
+      
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+            azcliversion: 2.0.72
+            inlineScript: |
+              az logout
+              az cache purge
+              az account clear
+
+
+  Deploy-Prod:
+    runs-on: 'ubuntu-latest'
+    environment: 'prod'
+    needs: [Build-Test,Deploy-Dev]
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
