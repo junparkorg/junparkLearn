@@ -25,8 +25,8 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.400' 
-      - run: dotnet build /WebApp/WebApp.csproj --configuration Release
-        
+      - run: dotnet build --configuration Release
+        working-directory: /WebApp
       - run: dotnet test        
 
       
