@@ -24,7 +24,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.9' 
+          dotnet-version: '5.0.400' 
       - run: dotnet build
       - run: dotnet test        
 
