@@ -16,7 +16,7 @@ env:
 
 jobs:
   Build-Test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     
     strategy:
       matrix:
@@ -37,6 +37,14 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --verbosity normal
         working-directory: ./WebApp      
+
+      - name: Pack
+        run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=${{ env.COMMIT_REF }} WebApp/WebApp.csproj
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./WebApp/bin/Release/*.nupkg
 
   Deploy-Dev:
     runs-on: 'ubuntu-latest'
