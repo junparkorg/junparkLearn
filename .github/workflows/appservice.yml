@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --verbosity normal
         working-directory: ./WebApp      
-
+            
       - name: Pack
         run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release
       - name: Push with dotnet
