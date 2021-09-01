@@ -39,7 +39,10 @@ jobs:
         working-directory: ./WebApp      
 
       - name: Pack
-        run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=${{ env.COMMIT_REF }} WebApp/WebApp.csproj
+        run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release
+      - name: Push with dotnet
+        run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
