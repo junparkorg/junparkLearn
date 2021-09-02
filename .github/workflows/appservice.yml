@@ -16,7 +16,7 @@ env:
 
 jobs:
   Build-Test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     
     strategy:
       matrix:
@@ -37,6 +37,17 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --verbosity normal
         working-directory: ./WebApp      
+            
+      - name: Pack
+        run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release
+      - name: Push with dotnet
+        run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./WebApp/bin/Release/*.nupkg
 
   Deploy-Dev:
     runs-on: 'ubuntu-latest'
