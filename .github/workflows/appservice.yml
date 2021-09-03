@@ -38,7 +38,7 @@ jobs:
         run: dotnet restore
         working-directory: ./WebApp
       - name: Build
-        run: dotnet build --runtime win-x64 --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
         working-directory: ./WebApp
       - name: Test
         run: dotnet test --no-restore --verbosity normal
