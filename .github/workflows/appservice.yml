@@ -57,7 +57,7 @@ jobs:
       #    path: ./Library/JPLibrary/bin/Release/*.nupkg     
 
       - name: Packaging
-        run: dotnet pack -c Release --no-restore  Library/JPLibrary.csproj
+        run: dotnet pack -c Release Library/JPLibrary.csproj
       - name: publish to github package
         run: dotnet nuget push "./Library/JPLibrary/bin/Release/JPLibrary.1.0.1.nupkg" --source "github"
       
