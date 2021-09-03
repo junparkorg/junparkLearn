@@ -48,14 +48,18 @@ jobs:
       #  run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
       # nuget package publish to github Action.
+      #- name: Pack
+      #  run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID Library/JPLibrary/JPLibrary.csproj
+      #- name: Upload Artifact
+      #  uses: actions/upload-artifact@v2.2.4
+      #  with:
+      #    name: nupkg
+      #    path: ./Library/JPLibrary/bin/Release/*.nupkg     
+
       - name: Pack
-        run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID Library/JPLibrary/JPLibrary.csproj
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: nupkg
-          path: ./Library/JPLibrary/bin/Release/*.nupkg     
+        run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
   
+
   Prerelease:
     needs: Build-Test
     runs-on: ubuntu-latest
