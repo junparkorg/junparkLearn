@@ -35,7 +35,7 @@ jobs:
         run: dotnet restore
         working-directory: ./WebApp
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --runtime win-x64 --configuration Release --no-restore
         working-directory: ./WebApp
       - name: Test
         run: dotnet test --no-restore --verbosity normal
@@ -54,7 +54,8 @@ jobs:
       #  uses: actions/upload-artifact@v2.2.4
       #  with:
       #    name: nupkg
-      #    path: ./Library/JPLibrary/bin/Release/*.nupkg     
+      #    path: ./Library/JPLibrary/bin/Release/*.nupkg  
+      
       - name: Authentication with github 
         run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
       - name: Packaging
@@ -63,20 +64,20 @@ jobs:
         run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
       
 
-  Prerelease:
-    needs: Build-Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: nupkg
-      - name: Push to GitHub Feed
-        run: |
-          for f in *.nupkg
-          do
-            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-          done
+  #Prerelease:
+  #  needs: Build-Test
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: Download a Build Artifact
+  #      uses: actions/download-artifact@v2.0.10
+  #      with:
+  #        name: nupkg
+  #    - name: Push to GitHub Feed
+  #      run: |
+  #        for f in *.nupkg
+  #        do
+  #          curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
+  #        done
 
   Deploy-Dev:
     runs-on: 'ubuntu-latest'
