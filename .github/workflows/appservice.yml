@@ -20,7 +20,10 @@ env:
 jobs:
   Build-Test:
     runs-on: ubuntu-latest
-    
+    env:
+      DOTNET_NOLOGO: true
+        
+
     strategy:
       matrix:
         dotnet-version: ['5.0.x' ]
@@ -32,7 +35,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       
-      - name: Install dependencies
+      - name: Restore
         run: dotnet restore
         working-directory: ./WebApp
 
