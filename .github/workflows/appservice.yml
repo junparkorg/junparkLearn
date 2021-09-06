@@ -35,9 +35,14 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
         working-directory: ./WebApp
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      #- name: Build
+      #  run: dotnet build --configuration Release --no-restore
+      #  working-directory: ./WebApp
+
+      - name: Install dependencies
+        run: dotnet publish -r win-x64 --configuration Release --no-restore
         working-directory: ./WebApp
+
       - name: Test
         run: dotnet test --no-restore --verbosity normal
         working-directory: ./WebApp      
