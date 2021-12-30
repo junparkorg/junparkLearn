@@ -1,142 +1,142 @@
-name: App_service
+#name: App_service
 
-on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+#on:
+#  # Trigger the workflow on push or pull request,
+#  # but only for the main branch
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
 
-env:
-  resourceGroupName: githubkorea
-  COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
-  GITHUB_FEED: https://nuget.pkg.github.com/junparkorg/junparkLearn/
-  GITHUB_USER: junpark12
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#env:
+#  resourceGroupName: githubkorea
+#  COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
+#  GITHUB_FEED: https://nuget.pkg.github.com/junparkorg/junparkLearn/
+#  GITHUB_USER: junpark12
+#  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-jobs:
-  Build-Test:
-    runs-on: ubuntu-latest
-    env:
-      DOTNET_NOLOGO: true
+#jobs:
+#  Build-Test:
+#    runs-on: ubuntu-latest
+#    env:
+#      DOTNET_NOLOGO: true
         
 
-    strategy:
-      matrix:
-        dotnet-version: ['5.0.x' ]
+#    strategy:
+#      matrix:
+#        dotnet-version: ['5.0.x' ]
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v1.7.2
-        with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+#        uses: actions/setup-dotnet@v1.7.2
+#        with:
+#          dotnet-version: ${{ matrix.dotnet-version }}
       
-      - name: Restore
-        run: dotnet restore
-        working-directory: ./WebApp
+#      - name: Restore
+#        run: dotnet restore
+#        working-directory: ./WebApp
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-        working-directory: ./WebApp
+#      - name: Build
+#        run: dotnet build --configuration Release --no-restore
+#        working-directory: ./WebApp
       
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal
-        working-directory: ./WebApp      
+#      - name: Test
+#        run: dotnet test --no-restore --verbosity normal
+#        working-directory: ./WebApp      
       
-      # nuget package publish to nuget.org
-      #- name: Pack
-      #  run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release --skip-duplicate
-      #- name: Push with dotnet
-      #  run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+#      # nuget package publish to nuget.org
+#      #- name: Pack
+#      #  run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release --skip-duplicate
+#      #- name: Push with dotnet
+#      #  run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
-      # nuget package publish to github Action.
-      #- name: Pack
-      #  run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID Library/JPLibrary/JPLibrary.csproj
-      #- name: Upload Artifact
-      #  uses: actions/upload-artifact@v2.2.4
-      #  with:
-      #    name: nupkg
-      #    path: ./Library/JPLibrary/bin/Release/*.nupkg  
+#      # nuget package publish to github Action.
+#      #- name: Pack
+#      #  run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID Library/JPLibrary/JPLibrary.csproj
+#      #- name: Upload Artifact
+#      #  uses: actions/upload-artifact@v2.2.4
+#      #  with:
+#      #    name: nupkg
+#      #    path: ./Library/JPLibrary/bin/Release/*.nupkg  
       
-      #- name: Authentication with github 
-      #  run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
-      #- name: Packaging
-      #  run: dotnet pack -c Release Library/JPLibrary.csproj
-      #- name: publish to github package
-      #  run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
+#      #- name: Authentication with github 
+#      #  run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
+#      #- name: Packaging
+#      #  run: dotnet pack -c Release Library/JPLibrary.csproj
+#      #- name: publish to github package
+#      #  run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
       
 
-  #Prerelease:
-  #  needs: Build-Test
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - name: Download a Build Artifact
-  #      uses: actions/download-artifact@v2.0.10
-  #      with:
-  #        name: nupkg
-  #    - name: Push to GitHub Feed
-  #      run: |
-  #        for f in *.nupkg
-  #        do
-  #          curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-  #        done
+#  #Prerelease:
+#  #  needs: Build-Test
+#  #  runs-on: ubuntu-latest
+#  #  steps:
+#  #    - name: Download a Build Artifact
+#  #      uses: actions/download-artifact@v2.0.10
+#  #      with:
+#  #        name: nupkg
+#  #    - name: Push to GitHub Feed
+#  #      run: |
+#  #        for f in *.nupkg
+#  #        do
+#  #          curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
+#  #        done
 
-  #Deploy-Dev:
-  #  runs-on: 'ubuntu-latest'
-  #  environment: 'dev'
-  #  needs: Build-Test
-  #  steps:
-  #    - uses: actions/checkout@v2
-  #    - name: Login to Azure
-  #      uses: azure/login@v1
-  #      with:
-  #          creds: ${{ secrets.AZURE_CREDENTIALS }}
-  #    #create resource group
-  #    - name: Create Resource Group
-  #      run: |
-  #        az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+#  #Deploy-Dev:
+#  #  runs-on: 'ubuntu-latest'
+#  #  environment: 'dev'
+#  #  needs: Build-Test
+#  #  steps:
+#  #    - uses: actions/checkout@v2
+#  #    - name: Login to Azure
+#  #      uses: azure/login@v1
+#  #      with:
+#  #          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#  #    #create resource group
+#  #    - name: Create Resource Group
+#  #      run: |
+#  #        az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
 
-  #    #Deploy Arm Template 
-  #    - name: Deploy Azure Resource Manager (ARM) Template
-  #      uses: azure/arm-deploy@v1
-  #      id: deploy
-  #      with:
-  #        scope: resourcegroup
-  #        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-  #        resourceGroupName: ${{ env.resourceGroupName }}
-  #        template: ./Infrastructure/main.json
-  #        deploymentMode: Incremental
+#  #    #Deploy Arm Template 
+#  #    - name: Deploy Azure Resource Manager (ARM) Template
+#  #      uses: azure/arm-deploy@v1
+#  #      id: deploy
+#  #      with:
+#  #        scope: resourcegroup
+#  #        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+#  #        resourceGroupName: ${{ env.resourceGroupName }}
+#  #        template: ./Infrastructure/main.json
+#  #        deploymentMode: Incremental
 
-  #    - name: Build image with ACR
-  #      run: |
-  #        az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
+#  #    - name: Build image with ACR
+#  #      run: |
+#  #        az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
            
 
-  #    - name: Deploy the image to App Service
-  #      run: |
-  #        az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
+#  #    - name: Deploy the image to App Service
+#  #      run: |
+#  #        az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
       
 
-  #    - name: Azure CLI script
-  #      uses: azure/CLI@v1
-  #      with:
-  #          azcliversion: 2.0.72
-  #          inlineScript: |
-  #            az logout
-  #            az cache purge
-  #            az account clear
+#  #    - name: Azure CLI script
+#  #      uses: azure/CLI@v1
+#  #      with:
+#  #          azcliversion: 2.0.72
+#  #          inlineScript: |
+#  #            az logout
+#  #            az cache purge
+#  #            az account clear
 
 
-  #Deploy-Prod:
-  #  runs-on: 'ubuntu-latest'
-  #  environment: 'prod'
-  #  needs: [Build-Test,Deploy-Dev]
-  #  steps:
-  #    - name: Login to Azure
-  #      uses: azure/login@v1
-  #      with:
-  #          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#  #Deploy-Prod:
+#  #  runs-on: 'ubuntu-latest'
+#  #  environment: 'prod'
+#  #  needs: [Build-Test,Deploy-Dev]
+#  #  steps:
+#  #    - name: Login to Azure
+#  #      uses: azure/login@v1
+#  #      with:
+#  #          creds: ${{ secrets.AZURE_CREDENTIALS }}
