@@ -90,6 +90,7 @@ jobs:
     environment: 'dev'
     needs: Build-Test
     steps:
+      #login to azure
       - uses: actions/checkout@v2
       - name: Login to Azure
         uses: azure/login@v1
