@@ -2,6 +2,7 @@
 
 namespace App6.Data
 {
+    // Code QL 테스트 용.
     public class DataAccess
     {
         // test for code Security.
