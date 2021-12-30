@@ -62,12 +62,12 @@ jobs:
       #    name: nupkg
       #    path: ./Library/JPLibrary/bin/Release/*.nupkg  
       
-      - name: Authentication with github 
-        run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
-      - name: Packaging
-        run: dotnet pack -c Release Library/JPLibrary.csproj
-      - name: publish to github package
-        run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
+      #- name: Authentication with github 
+      #  run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
+      #- name: Packaging
+      #  run: dotnet pack -c Release Library/JPLibrary.csproj
+      #- name: publish to github package
+      #  run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
       
 
   #Prerelease:
