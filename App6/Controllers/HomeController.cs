@@ -15,6 +15,7 @@ namespace App6.Controllers
 
         public IActionResult Index()
         {
+            string s = "changed project package";
             return View();
         }
 
