@@ -13,6 +13,7 @@ on:
 env:
   resourceGroupName: appservicekorea
   acrName: jpWebGithubacr
+  appserviceName: jpWebGithub
   COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
   GITHUB_FEED: https://nuget.pkg.github.com/junparkorg/junparkLearn/
   GITHUB_USER: junpark12
@@ -118,7 +119,7 @@ jobs:
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
       - name: Deploy the image to App Service
         run: |
-            az webapp config container set --name ${{ env.acrName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
+            az webapp config container set --name ${{ env.appserviceName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }} --slot staging
 
       - name: Azure CLI script
         uses: azure/CLI@v1

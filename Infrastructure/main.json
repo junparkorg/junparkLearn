@@ -94,6 +94,28 @@
 			]
 		},
 		{
+			"type": "Microsoft.Web/sites/slots",
+			"apiVersion": "2021-02-01",
+			"name": "[concat(parameters('webAppName'),'/staging')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+			],
+			"kind": "app,linux",
+			"properties": {
+				"enabled": true,
+				"reserved": true,
+				"isXenon": false,
+				"hyperV": false,
+				"siteConfig": {
+					"linuxFxVersion": "DOTNETCORE|6.0",
+					"alwaysOn": true,
+					"http20Enabled": false
+				}
+			}
+		}
+		,
+		{
 			"type": "Microsoft.ContainerRegistry/registries",
 			"apiVersion": "2020-11-01-preview",
 			"name": "[format('{0}acr', parameters('webAppName'))]",
