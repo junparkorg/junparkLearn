@@ -85,10 +85,10 @@ jobs:
 #  #          curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
 #  #        done
 
-  Deploy-Dev:
+  ARM-Deploy:
     runs-on: 'ubuntu-latest'
     environment: 'dev'
-    needs: Build-Test
+    if: contains(github.event.pull_request.labels.*.name, 'armupdate')
     steps:
       #login to azure
       - uses: actions/checkout@v2
@@ -101,43 +101,61 @@ jobs:
         run: |
           az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
 
-#  #    #Deploy Arm Template 
-#  #    - name: Deploy Azure Resource Manager (ARM) Template
-#  #      uses: azure/arm-deploy@v1
-#  #      id: deploy
-#  #      with:
-#  #        scope: resourcegroup
-#  #        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-#  #        resourceGroupName: ${{ env.resourceGroupName }}
-#  #        template: ./Infrastructure/main.json
-#  #        deploymentMode: Incremental
+      #Deploy Arm Template 
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: azure/arm-deploy@v1
+        id: deploy
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ env.resourceGroupName }}
+          template: ./Infrastructure/main.json
+          deploymentMode: Incremental
 
-#  #    - name: Build image with ACR
-#  #      run: |
-#  #        az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
-           
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+            azcliversion: 2.0.72
+            inlineScript: |
+              az logout
+              az cache purge
+              az account clear
 
-#  #    - name: Deploy the image to App Service
-#  #      run: |
-#  #        az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
-      
+  Deploy-Dev:
+    runs-on: 'ubuntu-latest'
+    environment: 'dev'
+    if: ${{ always() }}
+    needs: [Build-Test,ARM-Deploy]
+    steps:
+      #login to azure
+      - uses: actions/checkout@v2
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Build image with ACR
+        run: |
+            az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
+      - name: Deploy the image to App Service
+        run: |
+            az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
 
-#  #    - name: Azure CLI script
-#  #      uses: azure/CLI@v1
-#  #      with:
-#  #          azcliversion: 2.0.72
-#  #          inlineScript: |
-#  #            az logout
-#  #            az cache purge
-#  #            az account clear
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+              az logout
+              az cache purge
+              az account clear     
 
 
-#  #Deploy-Prod:
-#  #  runs-on: 'ubuntu-latest'
-#  #  environment: 'prod'
-#  #  needs: [Build-Test,Deploy-Dev]
-#  #  steps:
-#  #    - name: Login to Azure
-#  #      uses: azure/login@v1
-#  #      with:
-#  #          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  Deploy-Prod:
+    runs-on: 'ubuntu-latest'
+    environment: 'prod'
+    needs: [Build-Test,Deploy-Dev]
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
