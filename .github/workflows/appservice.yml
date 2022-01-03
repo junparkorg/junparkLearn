@@ -12,10 +12,12 @@ on:
 
 env:
   resourceGroupName: appservicekorea
+  acrName: jpWebGithubacr
   COMMIT_REF: $(git rev-parse --short "$GITHUB_SHA")
   GITHUB_FEED: https://nuget.pkg.github.com/junparkorg/junparkLearn/
   GITHUB_USER: junpark12
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 jobs:
   Build-Test:
@@ -45,29 +47,7 @@ jobs:
       
       - name: Test
         run: dotnet test --no-restore --verbosity normal
-#        working-directory: ./WebApp      
-      
-#      # nuget package publish to nuget.org
-#      #- name: Pack
-#      #  run: dotnet pack -v normal Library/JPLibrary/JPLibrary.csproj --output nuget-packages --configuration Release --skip-duplicate
-#      #- name: Push with dotnet
-#      #  run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-      
-#      # nuget package publish to github Action.
-#      #- name: Pack
-#      #  run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID Library/JPLibrary/JPLibrary.csproj
-#      #- name: Upload Artifact
-#      #  uses: actions/upload-artifact@v2.2.4
-#      #  with:
-#      #    name: nupkg
-#      #    path: ./Library/JPLibrary/bin/Release/*.nupkg  
-      
-#      #- name: Authentication with github 
-#      #  run: dotnet nuget add source --username junpark12 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/junparkorg/index.json"
-#      #- name: Packaging
-#      #  run: dotnet pack -c Release Library/JPLibrary.csproj
-#      #- name: publish to github package
-#      #  run: dotnet nuget push "./Library/bin/Release/*.nupkg" --source "github" --skip-duplicate
+
       
 
 #  #Prerelease:
@@ -135,10 +115,10 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Build image with ACR
         run: |
-            az acr build --registry ${{ steps.deploy.outputs.registryNameOutput }} --image aspnet5webapp:${{ env.COMMIT_REF }} ./WebApp/
+            az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
       - name: Deploy the image to App Service
         run: |
-            az webapp config container set --name ${{ steps.deploy.outputs.webAppNameOutput }} --resource-group ${{ steps.deploy.outputs.resourceGroupOutput }} --docker-custom-image-name "${{ steps.deploy.outputs.registryNameOutput }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
+            az webapp config container set --name ${{ env.acrName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Azure CLI script
         uses: azure/CLI@v1
