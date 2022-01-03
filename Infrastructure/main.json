@@ -92,27 +92,6 @@
 				"[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
 				"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'webAppIdentity')]"
 			]
-		},
-		{
-			"type": "Microsoft.Web/sites/slots",
-			"apiVersion": "2021-02-01",
-			"name": "[concat(parameters('webAppName'),'/staging')]",
-			"location": "[parameters('location')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-			],
-			"kind": "app,linux",
-			"properties": {
-				"enabled": true,
-				"reserved": true,
-				"isXenon": false,
-				"hyperV": false,
-				"siteConfig": {
-					"linuxFxVersion": "DOTNETCORE|6.0",
-					"alwaysOn": true,
-					"http20Enabled": false
-				}
-			}
 		}
 		,
 		{

@@ -119,7 +119,7 @@ jobs:
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
       - name: Deploy the image to App Service
         run: |
-            az webapp config container set --name ${{ env.appserviceName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }} --slot staging
+            az webapp config container set --name ${{ env.appserviceName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet5webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Azure CLI script
         uses: azure/CLI@v1
