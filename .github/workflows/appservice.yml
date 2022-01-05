@@ -49,22 +49,6 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --verbosity normal
 
-      
-
-#  #Prerelease:
-#  #  needs: Build-Test
-#  #  runs-on: ubuntu-latest
-#  #  steps:
-#  #    - name: Download a Build Artifact
-#  #      uses: actions/download-artifact@v2.0.10
-#  #      with:
-#  #        name: nupkg
-#  #    - name: Push to GitHub Feed
-#  #      run: |
-#  #        for f in *.nupkg
-#  #        do
-#  #          curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-#  #        done
 
   ARM-Deploy:
     runs-on: 'ubuntu-latest'
