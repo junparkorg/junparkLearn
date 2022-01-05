@@ -69,7 +69,7 @@
 			"properties": {
 				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
 				"siteConfig": {
-					"linuxFxVersion": "DOTNETCORE|5.0",
+					"linuxFxVersion": "DOTNETCORE|6.0",
 					"alwaysOn": true,
 					"acrUseManagedIdentityCreds": true,
 					"appSettings": [
@@ -92,7 +92,8 @@
 				"[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
 				"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'webAppIdentity')]"
 			]
-		},
+		}
+		,
 		{
 			"type": "Microsoft.ContainerRegistry/registries",
 			"apiVersion": "2020-11-01-preview",

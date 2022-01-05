@@ -1,8 +1,23 @@
-﻿@{
+﻿@Model App6.Models.Todo
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">userId</th>
+      <th scope="col">id</th>
+      <th scope="col">title</th>
+      <th scope="col">completed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="table-primary">
+      <td>@Model.userId</td>
+      <td>@Model.id</td>
+      <td>@Model.title</td>
+      <td>@Model.completed</td>
+    </tr>   
+  </tbody>
+</table>
