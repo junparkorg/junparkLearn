@@ -101,11 +101,12 @@ jobs:
       - name: Build image with ACR
         run: |
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
+            az acr import --name ${{ env.acrName }} --source ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} --image aspnet6webapp:latest --force
       
       #scan image
       - uses: azure/container-scan@v0
         with:
-          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:0c118d2
+          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:latest
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
