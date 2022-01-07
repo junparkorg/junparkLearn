@@ -105,8 +105,7 @@ jobs:
       #scan image
       - uses: azure/container-scan@v0
         with:
-          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} # loginServerlUrl/ would be empty if it's hosted on dockerhub; ${{ github.sha }} could also be replaced with any desired image tag
-          run-quality-checks: true
+          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
