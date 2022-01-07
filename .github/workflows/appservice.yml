@@ -105,7 +105,7 @@ jobs:
       #scan image
       - uses: azure/container-scan@v0
         with:
-          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}
+          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:0c118d2
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
