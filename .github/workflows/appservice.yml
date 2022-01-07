@@ -32,6 +32,7 @@ jobs:
         dotnet-version: ['6.0.x' ]
 
     steps:
+      - run: echo "event-${{ github.event_name }} branch-${{ github.ref }}"
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v1.7.2
