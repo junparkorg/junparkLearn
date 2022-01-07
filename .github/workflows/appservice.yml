@@ -101,6 +101,15 @@ jobs:
       - name: Build image with ACR
         run: |
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
+      
+      #scan image
+      - uses: azure/container-scan@v0
+        with:
+          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} # loginServerlUrl/ would be empty if it's hosted on dockerhub; ${{ github.sha }} could also be replaced with any desired image tag
+          run-quality-checks: true
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - name: Deploy the image to App Service
         run: |
             az webapp config container set --name ${{ env.appserviceName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
