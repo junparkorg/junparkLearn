@@ -32,6 +32,7 @@ jobs:
         dotnet-version: ['6.0.x' ]
 
     steps:
+      - run: echo "event-${{ github.event_name }} branch-${{ github.ref }}"
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v1.7.2
@@ -101,6 +102,15 @@ jobs:
       - name: Build image with ACR
         run: |
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
+            az acr import --name ${{ env.acrName }} --source ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} --image aspnet6webapp:latest --force
+      
+      #scan image
+      - uses: azure/container-scan@v0
+        with:
+          image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:latest
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - name: Deploy the image to App Service
         run: |
             az webapp config container set --name ${{ env.appserviceName }} --resource-group ${{ env.resourceGroupName }} --docker-custom-image-name "${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}" --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
