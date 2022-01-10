@@ -131,7 +131,7 @@ jobs:
   Deploy-Prod:
     runs-on: 'ubuntu-latest'
     environment: 'prod'
-    needs: [Build-Test,Deploy-Dev]
+    needs: [Deploy-Dev]
     steps:
       - name: Login to Azure
         uses: azure/login@v1
