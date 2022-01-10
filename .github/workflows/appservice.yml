@@ -132,6 +132,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     environment: 'prod'
     needs: [Deploy-Dev]
+    if: always() && needs.Deploy-Dev.result == 'success'
     steps:
       - name: Login to Azure
         uses: azure/login@v1
