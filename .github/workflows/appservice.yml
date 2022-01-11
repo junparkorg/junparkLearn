@@ -48,10 +48,20 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 #        working-directory: ./WebApp
-      
+    
       - name: Test
         run: dotnet test --no-restore --verbosity normal
 
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ./publish
+        working-directory: ./App6
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-app
+          path: ./App6
+      
 
   ARM-Deploy:
     runs-on: 'ubuntu-latest'
