@@ -111,6 +111,7 @@ jobs:
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
             az acr import --name ${{ env.acrName }} --source ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} --image aspnet6webapp:latest --force
             echo "::set-output name=url::${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}"
+     
       #scan image
       - uses: azure/container-scan@v0
         id: scan_image
@@ -139,7 +140,7 @@ jobs:
     needs: [Deploy-Dev]
     if: always() && needs.Deploy-Dev.result == 'success'
     steps:
-      - run: echo ${{ needs.Deploy-Dev.outputs.url }}
+      - run: echo ${{ needs.Deploy-Dev.outputs.url }} ${{ needs.Deploy-Dev.outputs.message }}
       - name: Login to Azure
         uses: azure/login@v1
         with:
