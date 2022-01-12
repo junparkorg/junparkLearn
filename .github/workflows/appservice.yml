@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOTNET_NOLOGO: true
-        
 
     strategy:
       matrix:
@@ -49,52 +48,77 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 #        working-directory: ./WebApp
-      
+    
       - name: Test
         run: dotnet test --no-restore --verbosity normal
 
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ./publish
+        working-directory: ./App6
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-app
+          path: ./App6
+      
 
   ARM-Deploy:
-    runs-on: 'ubuntu-latest'
-    environment: 'dev'
-    if: contains(github.event.pull_request.labels.*.name, 'armupdate')
-    steps:
-      #login to azure
-      - uses: actions/checkout@v2
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #create resource group
-      - name: Create Resource Group
-        run: |
-          az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+    uses: junparkorg/junparkLearn/.github/workflows/Armdeploy.yml@main
+    with:
+      armupdate: contains(github.event.pull_request.labels.*.name, 'armupdate')
+      env_name: 'dev'
+      rg_name: ${{ env.resourceGroupName }}
 
-      #Deploy Arm Template 
-      - name: Deploy Azure Resource Manager (ARM) Template
-        uses: azure/arm-deploy@v1
-        id: deploy
-        with:
-          scope: resourcegroup
-          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.resourceGroupName }}
-          template: ./Infrastructure/main.json
-          deploymentMode: Incremental
+    secrets:
+      az_clidential: ${{ secrets.AZURE_CREDENTIALS }}
+      subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
 
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-            azcliversion: 2.0.72
-            inlineScript: |
-              az logout
-              az cache purge
-              az account clear
+
+    #runs-on: 'ubuntu-latest'
+    #environment: 'dev'
+    #if: contains(github.event.pull_request.labels.*.name, 'armupdate')
+    #steps:
+    #  #login to azure
+    #  - uses: actions/checkout@v2
+    #  - name: Login to Azure
+    #    uses: azure/login@v1
+    #    with:
+    #        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #  #create resource group
+    #  - name: Create Resource Group
+    #    run: |
+    #      az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+
+    #  #Deploy Arm Template 
+    #  - name: Deploy Azure Resource Manager (ARM) Template
+    #    uses: azure/arm-deploy@v1
+    #    id: deploy
+    #    with:
+    #      scope: resourcegroup
+    #      subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+    #      resourceGroupName: ${{ env.resourceGroupName }}
+    #      template: ./Infrastructure/main.json
+    #      deploymentMode: Incremental
+
+    #  - name: Azure CLI script
+    #    uses: azure/CLI@v1
+    #    with:
+    #        azcliversion: 2.0.72
+    #        inlineScript: |
+    #          az logout
+    #          az cache purge
+    #          az account clear
 
   Deploy-Dev:
     runs-on: 'ubuntu-latest'
     environment: 'dev'
     if: ${{ always() }}
     needs: [Build-Test,ARM-Deploy]
+    outputs:
+      message: "this is message from deploy-dev"
+      url: ${{ steps.buildimg.outputs.url }}
+
     steps:
       #login to azure
       - uses: actions/checkout@v2
@@ -103,12 +127,15 @@ jobs:
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Build image with ACR
+        id: buildimg
         run: |
             az acr build --registry ${{ env.acrName }} --image aspnet6webapp:${{ env.COMMIT_REF }} ./App6/
             az acr import --name ${{ env.acrName }} --source ${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }} --image aspnet6webapp:latest --force
-      
+            echo "::set-output name=url::${{ env.acrName }}.azurecr.io/aspnet6webapp:${{ env.COMMIT_REF }}"
+     
       #scan image
       - uses: azure/container-scan@v0
+        id: scan_image
         with:
           image-name: ${{ env.acrName }}.azurecr.io/aspnet6webapp:latest
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -134,6 +161,7 @@ jobs:
     needs: [Deploy-Dev]
     if: always() && needs.Deploy-Dev.result == 'success'
     steps:
+      - run: echo ${{ needs.Deploy-Dev.outputs.url }} ${{ needs.Deploy-Dev.outputs.message }}
       - name: Login to Azure
         uses: azure/login@v1
         with:

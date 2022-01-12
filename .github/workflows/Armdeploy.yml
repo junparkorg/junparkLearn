@@ -1,0 +1,57 @@
+name: Arm deploy 
+
+on:
+  workflow_call:
+    inputs:
+      armupdate:
+        required: true
+        type: boolean
+      env_name:
+        required: true
+        type: string
+      rg_name:
+        required: true
+        type: string
+
+    secrets:
+      az_clidential:
+        required: true
+      subscriptionId:
+        required: true
+
+jobs:
+  ARM-Deploy:
+    runs-on: 'ubuntu-latest'
+    environment: ${{ inputs.env_name }}
+    if: ${{ inputs.armupdate }}
+    steps:
+      #login to azure
+      - uses: actions/checkout@v2
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.az_clidential }}
+      #create resource group
+      - name: Create Resource Group
+        run: |
+          az group create -g "${{ inputs.rg_name }}" -l "Korea Central"
+
+      #Deploy Arm Template 
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: azure/arm-deploy@v1
+        id: deploy
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.subscriptionId }}
+          resourceGroupName: ${{ inputs.rg_name }}
+          template: ./Infrastructure/main.json
+          deploymentMode: Incremental
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+            azcliversion: 2.0.72
+            inlineScript: |
+              az logout
+              az cache purge
+              az account clear  
