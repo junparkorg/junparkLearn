@@ -67,7 +67,6 @@ jobs:
     uses: junparkorg/junparkLearn/.github/workflows/Armdeploy.yml@main
     if: contains(github.event.pull_request.labels.*.name, 'armupdate')
     with:
-      armupdate: true
       env_name: 'dev'
       rg_name: 'appservicekorea'
 
