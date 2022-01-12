@@ -1,0 +1,66 @@
+name: App deploy 
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        required: true
+        type: string
+      rg_name:
+        required: true
+        type: string
+      acr_name:
+        required: true
+        type: string
+      img_tag:
+        required: true
+        type: string
+      appsvc_name:
+        required: true
+        type: string
+
+    secrets:
+      az_clidential:
+        required: true
+      reg_username:
+        required: true
+      reg_password:
+        required: true
+
+jobs:
+  Deploy-App:
+    runs-on: 'ubuntu-latest'
+    environment: ${{ inputs.env_name }}
+    steps:
+      #login to azure
+      - uses: actions/checkout@v2
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.az_clidential }}
+      - name: Build image with ACR
+        id: buildimg
+        run: |
+            az acr build --registry ${{ inputs.acr_name }} --image aspnet6webapp:${{ inputs.img_tag }} ./App6/
+            az acr import --name ${{ inputs.acr_name }} --source ${{ inputs.acr_name }}.azurecr.io/aspnet6webapp:${{ inputs.img_tag }} --image aspnet6webapp:latest --force
+            
+      #scan image
+      - uses: azure/container-scan@v0
+        id: scan_image
+        with:
+          image-name: ${{ inputs.acr_name }}.azurecr.io/aspnet6webapp:latest
+          username: ${{ secrets.reg_username }}
+          password: ${{ secrets.reg_password }}
+
+      - name: Deploy the image to App Service
+        run: |
+            az webapp config container set --name ${{ inputs.appsvc_name }} --resource-group ${{ inputs.rg_name }} --docker-custom-image-name "${{ inputs.acr_name }}.azurecr.io/aspnet6webapp:${{ inputs.img_tag }}" --docker-registry-server-user ${{ secrets.reg_username }} --docker-registry-server-password ${{ secrets.reg_password }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+              az logout
+              az cache purge
+              az account clear     
