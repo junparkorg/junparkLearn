@@ -68,7 +68,7 @@ jobs:
     with:
       armupdate: contains(github.event.pull_request.labels.*.name, 'armupdate')
       env_name: 'dev'
-      rg_name: ${{ env.resourceGroupName }}
+      rg_name: 'appservicekorea'
 
     secrets:
       az_clidential: ${{ secrets.AZURE_CREDENTIALS }}
