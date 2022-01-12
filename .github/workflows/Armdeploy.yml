@@ -3,9 +3,6 @@ name: Arm deploy
 on:
   workflow_call:
     inputs:
-      armupdate:
-        required: true
-        type: boolean
       env_name:
         required: true
         type: string
@@ -23,7 +20,6 @@ jobs:
   ARM-Deploy:
     runs-on: 'ubuntu-latest'
     environment: ${{ inputs.env_name }}
-    if: ${{ inputs.armupdate }}
     steps:
       #login to azure
       - uses: actions/checkout@v2
