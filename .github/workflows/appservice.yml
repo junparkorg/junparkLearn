@@ -65,15 +65,16 @@ jobs:
 
   ARM-Deploy:
     uses: junparkorg/junparkLearn/.github/workflows/Armdeploy.yml@main
+    if: contains(github.event.pull_request.labels.*.name, 'armupdate')
     with:
-      armupdate: contains(github.event.pull_request.labels.*.name, 'armupdate')
+      armupdate: true
       env_name: 'dev'
       rg_name: 'appservicekorea'
 
     secrets:
       az_clidential: ${{ secrets.AZURE_CREDENTIALS }}
       subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-
+      
 
     #runs-on: 'ubuntu-latest'
     #environment: 'dev'
