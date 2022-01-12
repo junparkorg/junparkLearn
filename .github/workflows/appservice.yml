@@ -64,40 +64,51 @@ jobs:
       
 
   ARM-Deploy:
-    runs-on: 'ubuntu-latest'
-    environment: 'dev'
-    if: contains(github.event.pull_request.labels.*.name, 'armupdate')
-    steps:
-      #login to azure
-      - uses: actions/checkout@v2
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #create resource group
-      - name: Create Resource Group
-        run: |
-          az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+    uses: junparkorg/junparkLearn/.github/workflows/Armdeploy.yml@main
+    with:
+      armupdate: contains(github.event.pull_request.labels.*.name, 'armupdate')
+      env_name: 'dev'
+      rg_name: ${{ env.resourceGroupName }}
 
-      #Deploy Arm Template 
-      - name: Deploy Azure Resource Manager (ARM) Template
-        uses: azure/arm-deploy@v1
-        id: deploy
-        with:
-          scope: resourcegroup
-          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.resourceGroupName }}
-          template: ./Infrastructure/main.json
-          deploymentMode: Incremental
+    secrets:
+      az_clidential: ${{ secrets.AZURE_CREDENTIALS }}
+      subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
 
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-            azcliversion: 2.0.72
-            inlineScript: |
-              az logout
-              az cache purge
-              az account clear
+
+    #runs-on: 'ubuntu-latest'
+    #environment: 'dev'
+    #if: contains(github.event.pull_request.labels.*.name, 'armupdate')
+    #steps:
+    #  #login to azure
+    #  - uses: actions/checkout@v2
+    #  - name: Login to Azure
+    #    uses: azure/login@v1
+    #    with:
+    #        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #  #create resource group
+    #  - name: Create Resource Group
+    #    run: |
+    #      az group create -g "${{ env.resourceGroupName }}" -l "Korea Central"
+
+    #  #Deploy Arm Template 
+    #  - name: Deploy Azure Resource Manager (ARM) Template
+    #    uses: azure/arm-deploy@v1
+    #    id: deploy
+    #    with:
+    #      scope: resourcegroup
+    #      subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+    #      resourceGroupName: ${{ env.resourceGroupName }}
+    #      template: ./Infrastructure/main.json
+    #      deploymentMode: Incremental
+
+    #  - name: Azure CLI script
+    #    uses: azure/CLI@v1
+    #    with:
+    #        azcliversion: 2.0.72
+    #        inlineScript: |
+    #          az logout
+    #          az cache purge
+    #          az account clear
 
   Deploy-Dev:
     runs-on: 'ubuntu-latest'
