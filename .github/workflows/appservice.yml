@@ -12,6 +12,9 @@ on:
   repository_dispatch:
     types: [run_my_workflow]
 
+permissions:
+  id-token: write
+
 env:
   resourceGroupName: appservicekorea
   acrName: jpWebGithubacr
