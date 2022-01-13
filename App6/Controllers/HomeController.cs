@@ -1,4 +1,5 @@
 ﻿using App6.Models;
+using App6.Util;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -15,9 +16,13 @@ namespace App6.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
+        // Get Todo List
         public async Task<IActionResult> Index()
         {
             Todo todo = await GetTodoAsync();
+
+            ViewBag.BuildTime = BuildInfo.GetLinkerTime(Assembly.GetEntryAssembly());
+
             return View(todo);
         }
 
@@ -50,9 +55,6 @@ namespace App6.Controllers
             return list;
         }
 
-        
-
-       
 
         public IActionResult Privacy()
         {
