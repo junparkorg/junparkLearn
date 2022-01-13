@@ -14,6 +14,7 @@ on:
 
 permissions:
   id-token: write
+  contents: read
 
 env:
   resourceGroupName: appservicekorea
@@ -36,6 +37,17 @@ jobs:
         dotnet-version: ['6.0.x' ]
 
     steps:
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: 'Run az commands'
+        run: |
+          az account show
+          az group list
+          pwd 
       - run: echo "Payload ${{ github.event.client_payload.mydata }}"
       - run: echo "event---${{ github.event_name }} branch---${{ github.ref }}"
       - uses: actions/checkout@v2
