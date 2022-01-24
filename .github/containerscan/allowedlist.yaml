@@ -3,6 +3,12 @@ general:
     - CVE-2021-33574
     - CVE-2021-33560
     - CVE-2020-16156
+    - CVE-2022-23218
+    - CVE-2022-23219
+    - CVE-2021-3999
+    - CVE-2022-23218
+    - CVE-2022-23219
+    - CVE-2021-3999
   bestPracticeViolations:
     - CIS-DI-0001
     - DKL-DI-0006
