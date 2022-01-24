@@ -102,11 +102,5 @@ jobs:
     needs: [Deploy-App]
     if: always() && needs.Deploy-App.result == 'success'
     steps:
-      - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.6.1
-        with:
-          target: 'https://jpwebgithub.azurewebsites.net'
-          allow_issue_writing: true
-          fail_action: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
+      - name: echo a string
+        run: echo "Hello, production world!"
