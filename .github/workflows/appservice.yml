@@ -106,4 +106,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.6.1
         with:
           target: 'https://jpwebgithub.azurewebsites.net'
+          allow_issue_writing: true
+          fail_action: false
+
       
