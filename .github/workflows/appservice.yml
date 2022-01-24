@@ -108,5 +108,5 @@ jobs:
           target: 'https://jpwebgithub.azurewebsites.net'
           allow_issue_writing: true
           fail_action: false
-
+          token: ${{ secrets.GITHUB_TOKEN }}
       
