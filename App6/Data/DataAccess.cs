@@ -9,10 +9,10 @@ namespace App6.Data
         private const string DataAccessKey = "server=1.1.1.1;uid=sa;pwd=NotAPassword;database=nodb";
 
         
-        public async task<sqlconnection> createconnection()
+        public async Task<SqlConnection> CreateConnection()
         {
-            sqlconnection conn = new sqlconnection(dataaccesskey);
-            await conn.openasync();
+            SqlConnection conn = new SqlConnection(DataAccessKey);
+            await conn.OpenAsync();
             return conn;
         }
     }
