@@ -20,9 +20,3 @@ jobs:
           target: 'https://appservicekorea.azurewebsites.net/'
           rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a'
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Securit
