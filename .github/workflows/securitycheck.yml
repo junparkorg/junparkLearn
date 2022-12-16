@@ -1,7 +1,9 @@
-name: Security
+name: OWASP
 
 on:
-  workflow_call:
+  workflow_dispatch:
+    branches:
+    - main  
   
 jobs:
   zap_scan:
